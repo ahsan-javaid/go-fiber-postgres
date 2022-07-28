@@ -25,12 +25,12 @@ func (r *Repository) GetAllBook(context *fiber.Ctx) error {
 	err := r.DB.Find(bookModels).Error
 
 	if err != nil {
-		context.Status(http.StatusUnprocessableEntity).JSON(&fiber.Map{"msg": "req failer"})
+		context.Status(http.StatusBadRequest).JSON(&fiber.Map{"msg": "req failed"})
 
 		return err
 	}
 
-	context.Status(http.StatusUnprocessableEntity).JSON(&fiber.Map{"msg": "success", "data": bookModels})
+	context.Status(http.StatusOK).JSON(&fiber.Map{"msg": "success", "data": bookModels})
 
 	return nil
 }
