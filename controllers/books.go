@@ -1,10 +1,8 @@
 package controllers
 
 import (
+	"books-crud/common"
 	"books-crud/models"
-	"fmt"
-	"net/http"
-
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
@@ -14,8 +12,9 @@ type Repository struct {
 }
 
 type Book struct {
-	Author    string `json:"author"`
+	ID        int    `json:"id"`
 	Title     string `json:"title"`
+	Author    string `json:"author"`
 	Publisher string `json:"publisher"`
 }
 
@@ -25,14 +24,10 @@ func (r *Repository) GetAllBook(context *fiber.Ctx) error {
 	err := r.DB.Find(bookModels).Error
 
 	if err != nil {
-		context.Status(http.StatusBadRequest).JSON(&fiber.Map{"msg": "req failed"})
-
-		return err
+		return common.Http400(context, err.Error())
 	}
 
-	context.Status(http.StatusOK).JSON(&fiber.Map{"msg": "success", "data": bookModels})
-
-	return nil
+	return common.Http200(context, bookModels)
 }
 
 func (r *Repository) CreateBook(context *fiber.Ctx) error {
@@ -41,72 +36,49 @@ func (r *Repository) CreateBook(context *fiber.Ctx) error {
 	err := context.BodyParser(&book)
 
 	if err != nil {
-		context.Status(http.StatusUnprocessableEntity).JSON(&fiber.Map{"msg": "req failer"})
-
-		return err
+		return common.Http400(context, err.Error())
 	}
 
-	err = r.DB.Create(&book).Error
+	result := r.DB.Create(&book)
 
-	if err != nil {
-		context.Status(http.StatusBadRequest).JSON(&fiber.Map{"msg": "cannot create book"})
-
-		return err
+	if result.Error != nil {
+		return common.Http400(context, err.Error())
 	}
 
-	context.Status(http.StatusOK).JSON(&fiber.Map{"msg": "book created"})
-
-	return nil
+	return common.Http200(context, book)
 }
 
 func (r *Repository) DeleteBook(context *fiber.Ctx) error {
 	bookModel := models.Books{}
 	id := context.Params("id")
 	if id == "" {
-		context.Status(http.StatusInternalServerError).JSON(&fiber.Map{
-			"message": "id cannot be empty",
-		})
-		return nil
+		return common.Http400(context, "id cannot be empty")
 	}
 
 	err := r.DB.Delete(bookModel, id)
 
 	if err.Error != nil {
-		context.Status(http.StatusBadRequest).JSON(&fiber.Map{
-			"message": "could not delete book",
-		})
-		return err.Error
+		return common.Http400(context, err.Error)
 	}
-	context.Status(http.StatusOK).JSON(&fiber.Map{
-		"message": "book delete successfully",
-	})
-	return nil
+
+	return common.Http200(context, "book deleted")
 }
 
 func (r *Repository) GetBookByID(context *fiber.Ctx) error {
 
 	id := context.Params("id")
 	bookModel := &models.Books{}
-	if id == "" {
-		context.Status(http.StatusInternalServerError).JSON(&fiber.Map{
-			"message": "id cannot be empty",
-		})
-		return nil
-	}
 
-	fmt.Println("the ID is", id)
+	if id == "" {
+		return common.Http400(context, "id is required")
+	}
 
 	err := r.DB.Where("id = ?", id).First(bookModel).Error
 	if err != nil {
-		context.Status(http.StatusBadRequest).JSON(
-			&fiber.Map{"message": "could not get the book"})
-		return err
+		return common.Http400(context, err.Error())
 	}
-	context.Status(http.StatusOK).JSON(&fiber.Map{
-		"message": "book id fetched successfully",
-		"data":    bookModel,
-	})
-	return nil
+
+	return common.Http200(context, bookModel)
 }
 
 func (r *Repository) SetupBookRoutes(app *fiber.App) {
