@@ -11,15 +11,8 @@ type Repository struct {
 	DB *gorm.DB
 }
 
-type Book struct {
-	ID        int    `json:"id"`
-	Title     string `json:"title"`
-	Author    string `json:"author"`
-	Publisher string `json:"publisher"`
-}
-
 func (r *Repository) GetAllBook(context *fiber.Ctx) error {
-	bookModels := &[]models.Books{}
+	bookModels := &[]models.Book{}
 
 	err := r.DB.Find(bookModels).Error
 
@@ -31,7 +24,7 @@ func (r *Repository) GetAllBook(context *fiber.Ctx) error {
 }
 
 func (r *Repository) CreateBook(context *fiber.Ctx) error {
-	book := Book{}
+	book := models.Book{}
 
 	err := context.BodyParser(&book)
 
@@ -49,7 +42,7 @@ func (r *Repository) CreateBook(context *fiber.Ctx) error {
 }
 
 func (r *Repository) DeleteBook(context *fiber.Ctx) error {
-	bookModel := models.Books{}
+	bookModel := models.Book{}
 	id := context.Params("id")
 	if id == "" {
 		return common.Http400(context, "id cannot be empty")
@@ -67,7 +60,7 @@ func (r *Repository) DeleteBook(context *fiber.Ctx) error {
 func (r *Repository) GetBookByID(context *fiber.Ctx) error {
 
 	id := context.Params("id")
-	bookModel := &models.Books{}
+	bookModel := &models.Book{}
 
 	if id == "" {
 		return common.Http400(context, "id is required")

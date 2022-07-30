@@ -2,7 +2,7 @@
 
 ### Requirements
 - Postgres
-- 
+- Gorm
 
 ### Built with
 - Gorm

@@ -49,6 +49,11 @@ func main() {
 
 	r.SetupBookRoutes(app)
 
+
+	app.Get("/", func(c *fiber.Ctx) error {
+		return c.SendString("Ok")
+	})
+
 	app.Listen(":8080")
 
 }
