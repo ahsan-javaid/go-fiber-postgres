@@ -43,11 +43,18 @@ func main() {
 		log.Fatal(err)
 	}
 
+	err = models.MigrateUsers(db)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	r := controllers.Repository{
 		DB: db,
 	}
 
 	r.SetupBookRoutes(app)
+	r.SetupUserRoutes(app)
 
 
 	app.Get("/", func(c *fiber.Ctx) error {
