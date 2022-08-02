@@ -1,6 +1,7 @@
 package models
 
 import (
+	"os"
 	"time"
 	"gorm.io/gorm"
 	"github.com/golang-jwt/jwt/v4"
@@ -26,7 +27,7 @@ func (user *User) CreateToken() string {
 	// Create token
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	signed, _ := token.SignedString([]byte("secret"))
+	signed, _ := token.SignedString([]byte(os.Getenv("secret")))
 
 	return signed
 }

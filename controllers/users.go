@@ -32,7 +32,36 @@ func (r *Repository) Login(context *fiber.Ctx) error {
 	return common.Http200(context, resp)
 }
 
+func (r *Repository) Signup(context *fiber.Ctx) error {
+	body := models.User{}
+
+	err := context.BodyParser(&body)
+
+	if err != nil {
+		return common.Http400(context, err.Error())
+	}
+
+	user := &models.User{}
+
+	r.DB.Where(&models.User{Email: body.Email}).First(&user)
+
+	if user.ID != 0 {
+		return common.Http400(context, "Email already exists")
+	}
+
+	result := r.DB.Create(&body)
+
+	if result.Error != nil {
+		return common.Http400(context, err.Error())
+	}
+
+	resp := map[string]interface{}{"token": body.CreateToken(), "user": body}
+
+	return common.Http200(context, resp)
+}
+
 func (r *Repository) SetupUserRoutes(app *fiber.App) {
-	api := app.Group("/api")
-	api.Post("/users/login", r.Login)
+	// public routes
+	app.Post("/users/login", r.Login)
+	app.Post("/users/signup", r.Signup)
 }

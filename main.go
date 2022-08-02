@@ -6,6 +6,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/joho/godotenv"
+	"books-crud/middleware"
 
 	"books-crud/models"
 	"books-crud/storage"
@@ -53,9 +54,9 @@ func main() {
 		DB: db,
 	}
 
+	middleware.Auth(app)
 	r.SetupBookRoutes(app)
 	r.SetupUserRoutes(app)
-
 
 	app.Get("/", func(c *fiber.Ctx) error {
 		return c.SendString("Ok")
