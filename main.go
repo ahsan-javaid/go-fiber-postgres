@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"fmt"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
@@ -32,12 +33,13 @@ func main() {
 
 
 	config := &storage.Config{
-		Host:     os.Getenv("host"),
-		Port:     os.Getenv("port"),
-		Password: os.Getenv("pass"),
-		User:     os.Getenv("user"),
-		SSLMode:  os.Getenv("ssl"),
-		DBName:   os.Getenv("db"),
+		Port:     os.Getenv("PORT"),
+		DBHost:     os.Getenv("DB_HOST"),
+		DBPort:     os.Getenv("DB_PORT"),
+		DBPassword: os.Getenv("DB_PASSWORD"),
+		DBUser:     os.Getenv("DB_USER"),
+		SSLMode:  os.Getenv("SSL"),
+		DBName:   os.Getenv("DB_NAME"),
 	}
 
 	db, err := storage.NewConnection(config)
@@ -70,6 +72,7 @@ func main() {
 		return c.SendString("Ok")
 	})
 
-	app.Listen(":8080")
+	app.Listen(fmt.Sprintf(":%v", config.Port))
+
 
 }
