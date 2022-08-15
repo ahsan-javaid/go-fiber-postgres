@@ -41,6 +41,12 @@ func (r *Repository) Signup(context *fiber.Ctx) error {
 		return common.Http400(context, err.Error())
 	}
 
+	errors := body.ValidateUser()
+
+	if len(errors) > 0 {
+		return common.Http400(context, errors)
+	}
+
 	user := &models.User{}
 
 	r.DB.Where(&models.User{Email: body.Email}).First(&user)
