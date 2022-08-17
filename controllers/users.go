@@ -3,6 +3,7 @@ package controllers
 import (
 	"books-crud/common"
 	"books-crud/models"
+	"books-crud/utils"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -21,9 +22,9 @@ func (r *Repository) Login(context *fiber.Ctx) error {
 
 	user := &models.User{}
 
-	r.DB.Where(&models.User{Email: email, Password: password}).First(&user)
+	r.DB.Where(&models.User{Email: email}).First(&user)
 
-	if user.ID == 0 {
+	if user.ID == 0 || utils.CheckPasswordHash(password, user.Password) == false {
 		return common.Http401(context, "Invalid email or password")
 	}
 
@@ -54,6 +55,8 @@ func (r *Repository) Signup(context *fiber.Ctx) error {
 	if user.ID != 0 {
 		return common.Http400(context, "Email already exists")
 	}
+
+	body.Password, _ = utils.HashPassword(body.Password)
 
 	result := r.DB.Create(&body)
 
