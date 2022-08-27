@@ -10,6 +10,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
+	"github.com/gofiber/fiber/v2/middleware/cors"
+
 	"github.com/joho/godotenv"
 	"books-crud/middleware"
 
@@ -27,7 +29,8 @@ func main() {
 	}
 
 	app := fiber.New()
-
+  // Default cors config
+  app.Use(cors.New())
 	app.Use(recover.New())
 	app.Use(logger.New(logger.Config{
 		Format: "[${time}] ${ip}  ${status} - ${latency} ${method} ${path}\n",
