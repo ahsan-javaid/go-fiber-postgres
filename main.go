@@ -11,6 +11,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/fiber/v2/middleware/monitor"
 
 	"github.com/joho/godotenv"
 	"books-crud/middleware"
@@ -29,6 +30,8 @@ func main() {
 	}
 
 	app := fiber.New()
+	app.Get("/metrics", monitor.New(monitor.Config{Title: "Go-Fiber-Postgres API"}))
+
   // Default cors config
   app.Use(cors.New())
 	app.Use(recover.New())
