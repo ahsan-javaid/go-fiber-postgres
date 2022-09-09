@@ -80,6 +80,11 @@ func main() {
 		return c.SendString("Ok")
 	})
 
+	// 404 Handler for path not matched
+	app.Use(func(c *fiber.Ctx) error {
+		return c.Status(404).JSON(&fiber.Map{ "msg": "Not Found"})// => 404 "Not Found"
+	})
+
 	// Listen from a different goroutine
 	go func() {
 		if err := app.Listen(fmt.Sprintf(":%v", config.Port)); err != nil {
